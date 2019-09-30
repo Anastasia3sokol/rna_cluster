@@ -44,14 +44,16 @@ per_cell_sum = mat.sum(axis=1)
 per_gene_sum = mat.sum(axis=0)
 
 #===== 2
-mat = mat[:,(per_gene_sum>=low_expr_thr) & (per_gene_sum<=high_expr_thr)] #just remove extreme outliers
 
+Q1 = mat.quantile(0.05)
+Q3 = mat.quantile(0.95)
+IQR = Q3 - Q1
+mat = mat[~((mat < (Q1 - 1.5 * IQR)) |(mat > (Q3 + 1.5 * IQR))).any(axis=1)] 
 mean_exp = mat.mean(axis=0)
 std_exp = np.sqrt(mat.std(axis=0))
 CV = std_exp/mean_exp
 
 #===== 3
-mat = mat[:,CV>=10]
 
 
 cells_expression = mat.sum(axis=1)
